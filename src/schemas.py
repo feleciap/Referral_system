@@ -1,5 +1,5 @@
-from datatime import datatime, timedelta
-from pydantic import BaseModel, EmailStr, Field, conint, constr
+from datetime import datetime, timedelta
+from pydantic import BaseModel, EmailStr, Field, constr
 from typing import List, Optional
 
 # Базовая схема для модели пользователя
@@ -15,8 +15,8 @@ class UserResponse(UserBase):
     id: int
     created_at: datetime
 
-class Config:
-    orm_mode = True
+    class Config:
+        orm_mode = True
 
 # Схема для аутентификации пользователя
 class Token(BaseModel):
@@ -70,3 +70,9 @@ class ReferralListResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+# Класс для представления пользователя (если требуется)
+class User(UserResponse):
+    # Дополнительные поля могут быть добавлены здесь
+    class Config:
+        from_attributes = True

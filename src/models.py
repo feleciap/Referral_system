@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from datatime import datetime
+from datetime import datetime
 from src.database import Base
 
 class User(Base):
-    __tablname__= 'users'
+    __tablename__= 'users'
 
     id = Column(Integer, primary_key= True, index= True)
     email = Column(String, unique= True, index= True, nullable= False)

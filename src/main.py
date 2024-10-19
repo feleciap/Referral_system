@@ -42,7 +42,7 @@ def custom_openapi():
         title= "Referral System API",
         version= "1.0.0",
         description= "API для управления реферальной системой.",
-        routers= app.routers,
+        routes= app.routes,
     )
     app.openapi_schema = openapi_schema
     return app.openapi_schema

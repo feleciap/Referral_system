@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from src.models import User, ReferralCode
 from src.schemas import UserCreate
+from datetime import datetime
 
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()

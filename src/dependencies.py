@@ -5,6 +5,7 @@ from jose import JWTError, jwt
 from src.database import SessionLocal
 from src import crud, schemas, security
 from src.config import SECRET_KEY, ALGORITHM
+from src.security import oauth2_scheme
 
 oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
