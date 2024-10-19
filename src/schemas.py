@@ -73,6 +73,7 @@ class ReferralListResponse(BaseModel):
 
 # Класс для представления пользователя (если требуется)
 class User(UserResponse):
+    id: int
     # Дополнительные поля могут быть добавлены здесь
     class Config:
         from_attributes = True
