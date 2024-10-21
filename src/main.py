@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+# from sqlalchemy.orm import Session
 from src.database import engine, Base
 from src.routers import auth, referral, users
 from fastapi.openapi.utils import get_openapi
-
+import asyncio
 
 # Инициализация базы данных
-Base.metadata.create_all(bind=engine)
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+# Base.metadata.create_all(bind=engine)
 
 # Инициализация FastAPI приложения
 app = FastAPI(
@@ -53,3 +56,8 @@ app.openapi = custom_openapi
 @app.get("/")
 async def root():
     return {"message": "Referral System API is up and running"}
+
+# Запуск инициализации базы данных при старте приложения
+@app.on_event("startup")
+async def on_startup():
+    await init_db()

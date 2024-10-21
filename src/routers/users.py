@@ -12,7 +12,7 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = await crud.get_user_by_email(db, user.email)
     if db_user:
         raise HTTPException(status_code=400, detail= "Email already registered")
-    return crud.create_user(db=db, user=user)
+    return await crud.create_user(db=db, user=user)
 
 @router.get("/users/me", response_model=schemas.UserResponse)
 async def read_current_user(current_user: schemas.UserResponse = Depends(get_current_user)):
@@ -22,7 +22,7 @@ async def read_current_user(current_user: schemas.UserResponse = Depends(get_cur
 @router.get("/users/{user_id}/referrals", response_model=List[schemas.UserResponse])
 async def get_referrals(user_id: int, db: Session = Depends(get_db)):
     """Маршрут для получения списка рефералов пользователя по его ID."""
-    referrals = await crud.get_referrals_by_referrer(db, user_id=user_id)
+    referrals = await crud.get_referrals_by_user(db, user_id=user_id)
     if not referrals:
         raise HTTPException(status_code=404, detail="No referrals found")
     return referrals

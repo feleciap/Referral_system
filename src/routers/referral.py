@@ -14,4 +14,4 @@ async def create_referral_code(expiry_days: int, db: Session = Depends(get_db), 
 
 @router.get("/get_referrals/{referrer_id}")
 async def get_referrals(referrer_id: int, db: Session = Depends(get_db)):
-    return crud.get_referrals_by_user(db, referrer_id)
+    return await crud.get_referrals_by_user(db, referrer_id)
