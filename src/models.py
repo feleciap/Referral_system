@@ -12,6 +12,8 @@ class User(Base):
     hashed_password = Column(String, nullable= False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     referral_code = relationship("ReferralCode", back_populates="owner")
+    tokens = relationship("UserToken", back_populates="user")
+
 
 class ReferralCode(Base):
     __tablename__ = 'referral_codes'
@@ -23,3 +25,12 @@ class ReferralCode(Base):
     is_active = Column(Boolean, default=True)
     owner_id = Column(Integer, ForeignKey('users.id'), nullable= False)
     owner = relationship("User", back_populates= "referral_code")
+
+class UserToken(Base):
+    __tablename__ = "user_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    token = Column(String, unique=True, index=True)
+    expiration = Column(DateTime)
+    user = relationship("User", back_populates="tokens")

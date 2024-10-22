@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Form
+from fastapi import APIRouter, Depends, HTTPException, Form, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
@@ -8,7 +8,7 @@ from src.config import ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter()
 
-@router.post("/token", response_model=schemas.Token)
+@router.post("/login", response_model=schemas.Token)
 async def login_for_access_token(
     email: str = Form(...),
     password: str = Form(...),
@@ -21,9 +21,14 @@ async def login_for_access_token(
             detail= "Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes= ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_teken = security.create_access_token(data={"sub": user.email}, expires_delta= access_token_expires)
-    return {"access_token": access_teken, "token_type": "bearer"}
+    # access_token_expires = timedelta(minutes= ACCESS_TOKEN_EXPIRE_MINUTES)
+    # access_token =await security.get_or_create_access_token(db=db, user_id=user.id)
+    access_token_info = await security.get_or_create_access_token(db=db, user_id=user.id)
+
+    return { 
+        "access_token": access_token_info["token"],  # Возвращаем токен
+        "expires_in": access_token_info["expires_in"],  # Возвращаем время жизни токена в секундах
+        "token_type": "bearer"}
 
 @router.post("/register", response_model=schemas.UserResponse)
 async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -32,32 +37,3 @@ async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db))
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     return await crud.create_user(db=db, user= user)    
-
-@router.post("/referral_code", response_model=schemas.ReferralCodeResponse)
-async def create_referral_code(
-    referral_code_data: schemas.ReferralCodeCreate, 
-    db: Session = Depends(get_db), 
-    current_user: schemas.UserResponse = Depends(get_current_user)):
-    """Создание реферального кода."""
-    existing_code = await crud.get_active_referral_code(db, current_user.id)
-    if existing_code:
-        existing_code.is_active = False
-        await db.commit()
-
-    new_code = await crud.create_referral_code(db, current_user.id, referral_code_data.code, referral_code_data.expires_at)
-    return new_code
-
-@router.delete("/referral-code/{code_id}", response_model=schemas.ReferralCodeResponse)
-async def delete_referral_code(
-    code_id: int, 
-    db: Session = Depends(get_db),
-    current_user: schemas.UserResponse = Depends(get_current_user)):
-    """Удаление реферального кода."""
-    referral_code = await crud.get_referrals_code_by_id(db, code_id)
-    if referral_code is None or referral_code.owner_id != current_user.id:
-        raise HTTPException(status_code=404, detail="Referral code not found or you do not have permission to delete it.")
-    
-    referral_code.is_active = False
-    await db.commit()
-    return {"detail": "Referral code deleted successfully."}
-
