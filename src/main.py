@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# from sqlalchemy.orm import Session
 from src.database import engine, Base
 from src.routers import auth, referral, users
 from fastapi.openapi.utils import get_openapi

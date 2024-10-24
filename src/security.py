@@ -63,42 +63,6 @@ async def get_or_create_access_token(db: AsyncSession, user_id: int):
 
     return {"token": access_token, "expires_in": access_token_expires.days}
 
-
-# def get_or_create_access_token(db: Session, user_id: int):
-#     # to_encode = data.copy()
-#     # if expires_delta:
-#     #     expire = datetime.utcnow() + expires_delta
-#     # else:
-#     #     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     # to_encode.update({"exp": expire})
-#     # return jwt.encode(to_encode, SECRET_KEY, algorithm= ALGORITHM)
-#     token_data = db.query(models.UserToken).filter(
-#         models.UserToken.user_id == user_id,
-#         models.UserToken.expiration > datetime.utcnow()
-#     ).first()
-
-#     if token_data:
-#         # Если токен найден и не истек, возвращаем его
-#         return token_data.token
-
-#     # Иначе создаем новый токен
-#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = security.get_or_create_access_token(
-#         user_id= user_id, 
-#         expires_delta=access_token_expires
-#     )
-
-#     # Сохраняем новый токен в базе данных
-#     new_token_data = models.UserToken(
-#         user_id=user_id,
-#         token=access_token,
-#         expiration=datetime.utcnow() + access_token_expires
-#     )
-#     db.add(new_token_data)
-#     db.commit()
-
-#     return access_token
-
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

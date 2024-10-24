@@ -21,8 +21,8 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, clas
 
 # Зависимость для получения асинхронной сессии базы данных для использования в запросах
 async def get_db():
-    database = SessionLocal()
+    db = SessionLocal()
     try:
-        yield database
+        yield db
     finally:
-        await database.close()  # Асинхронное закрытие сессии
+        db.close()
