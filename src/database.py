@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Строка подключения с асинхронным драйвером asyncpg
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://feleciap:123@localhost/warehouse")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Создание асинхронного движка SQLAlchemy для подключения к базе данных
 engine = create_async_engine(DATABASE_URL, echo=True)

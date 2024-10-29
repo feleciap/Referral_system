@@ -1,14 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select, desc
-from datetime import datetime, timedelta
-from src import schemas, crud, security
+from sqlalchemy import select
+from src import schemas, crud
 from src.models import User, ReferralCode
-from src.crud import get_user_by_email    
 from src.database import get_db
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-import logging
 from logging import getLogger
 from typing import Dict, Any
 
@@ -27,14 +23,12 @@ async def create_referral(email: str, db: Session = Depends(get_db)):
 
 @router.get("/get_referral_code")
 async def get_referral_code(email: str, db: AsyncSession = Depends(get_db)):
-    # Асинхронный запрос для поиска пользователя
     result = await db.execute(select(User).where(User.email == email).options(selectinload(User.referral_codes)))
     user = result.scalars().first()
     
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     
-    # Асинхронный запрос для поиска активного реферального кода
     referral_code_result = await db.execute(
         select(ReferralCode)
         .where(ReferralCode.owner_id == user.id, ReferralCode.is_active == True)
@@ -55,7 +49,6 @@ async def delete_referral_code(
     db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
     async with db.begin():
-        # First get the user
         user_stmt = select(User).filter(User.email == email)
         user_result = await db.execute(user_stmt)
         user = user_result.scalars().first()
@@ -63,7 +56,6 @@ async def delete_referral_code(
         if not user:
             raise HTTPException(status_code=404, detail="Пользователь не найден")
 
-        # Get the referral code
         stmt = select(ReferralCode).filter(
             ReferralCode.owner_id == user.id,
             ReferralCode.is_active == True
@@ -74,10 +66,8 @@ async def delete_referral_code(
         if not existing_code:
             raise HTTPException(status_code=404, detail="Реферальный код не найден")
 
-        # Update the code
         existing_code.is_active = False
         
-        # Create response data
         response_data = {
             "id": existing_code.id,
             "code": existing_code.code,

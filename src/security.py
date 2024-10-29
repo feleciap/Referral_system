@@ -1,6 +1,5 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from jose import JWTError, jwt
@@ -16,7 +15,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
-    """Создает и возвращает новый JWT-токен."""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -28,8 +26,6 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 
 async def get_or_create_access_token(db: AsyncSession, user_id: int):
-    """Получает существующий токен пользователя или создает новый."""
-    # Проверяем, существует ли токен для пользователя, который еще не истек
     result = await db.execute(
         select(models.UserToken).where(
             models.UserToken.user_id == user_id,
@@ -38,9 +34,8 @@ async def get_or_create_access_token(db: AsyncSession, user_id: int):
     )
     
     token_data = result.scalar_one_or_none()
-    # Если токен найден и он еще не истек, возвращаем его
     if token_data:
-        # return token_data.token
+
         time_left = token_data.expiration - datetime.utcnow()
         return {"token": token_data.token, "expires_in": time_left.days}
 

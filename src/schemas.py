@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, constr
 from typing import List, Optional
 
@@ -37,7 +37,8 @@ class TokenData(BaseModel):
 # Схема для создания реферального кода
 class ReferralCodeCreate(BaseModel):
     code: constr(min_length=5, max_length=10)
-    expires_at: datetime = Field(..., description= "Дата и время истечения срока действия реферального кода")
+    expires_at: datetime = Field(
+        ..., description= "Дата и время истечения срока действия реферального кода")
 
 # Схема для отображения реферального кода
 class ReferralCodeResponse(BaseModel):
@@ -78,9 +79,8 @@ class ReferralListResponse(BaseModel):
     class Config:
         orm_mode = True
 
-# Класс для представления пользователя (если требуется)
+# Класс для представления пользователя 
 class User(UserResponse):
     id: int
-    # Дополнительные поля могут быть добавлены здесь
     class Config:
         from_attributes = True

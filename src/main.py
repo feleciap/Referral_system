@@ -1,15 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.database import engine, Base
-from src.routers import auth, referral, users
+from src.routers import auth, referral
 from fastapi.openapi.utils import get_openapi
-import asyncio
 
 # Инициализация базы данных
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-# Base.metadata.create_all(bind=engine)
 
 # Инициализация FastAPI приложения
 app = FastAPI(
@@ -33,7 +31,6 @@ app.add_middleware(
 
 # Подключение маршрутов (роутеров)
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(referral.router, prefix="/referrals", tags=["Referrals"])
 
 # Кастомизация OpenAPI схемы (Swagger UI)

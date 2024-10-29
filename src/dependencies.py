@@ -1,7 +1,6 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from sqlalchemy.ext.asyncio import AsyncSession
 from jose import JWTError, jwt
 from src.database import SessionLocal
 from src import crud
@@ -12,7 +11,6 @@ oath2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Dependency to get the DB session
 async def get_db():
-    """Функция для получения сессии базы данных."""
     db = SessionLocal()
     try:
         yield db
@@ -21,7 +19,6 @@ async def get_db():
 
 # Dependency to get the current user from the token
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    """Функция для получения текущего пользователя по токену."""
     credentials_exception = HTTPException(
         status_code=401,
         detail="Не удалось проверить учетные данные",
