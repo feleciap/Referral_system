@@ -9,11 +9,15 @@ class UserBase(BaseModel):
 # Схема для создания пользователя (регистрация)
 class UserCreate(UserBase):
     password: constr(min_length=6)
+    referral_code: Optional[str] = None
 
 # Схема для отображения информации о пользователе (без пароля)
 class UserResponse(UserBase):
     id: int
     created_at: datetime
+    email: EmailStr
+    referral_code: Optional[str] = None 
+    referral_count: int
 
     class Config:
         orm_mode = True
@@ -23,6 +27,8 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     expires_in: float
+    referral_code: Optional[str] = Field(default=None)
+    referral_count: Optional[int] = Field(default=0)
 
 # Схема для валидации данных токена
 class TokenData(BaseModel):

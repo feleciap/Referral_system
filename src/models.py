@@ -11,6 +11,7 @@ class User(Base):
     hashed_password = Column(String, nullable= False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     referral_code = Column(String, nullable=True) 
+    referral_count = Column(Integer, default=0)
     referral_codes = relationship("ReferralCode", back_populates="owner")
     tokens = relationship("UserToken", back_populates="user")
 

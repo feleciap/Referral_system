@@ -18,7 +18,15 @@ async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
     result = await db.execute(query)
     return result.scalar_one_or_none()
 
-
+async def get_user_by_referral_code(db: AsyncSession, referral_code: str):
+    result = await db.execute(select(User).filter(User.referral_code == referral_code))
+    user = result.scalars().first()
+    
+    # Если пользователь не найден, возвращаем объект с пустым referral_code
+    if user is None:
+        return User(referral_code="")  # Или возвращайте любой другой подходящий объект
+    
+    return user
 
 # Создать пользователя
 async def create_user(db: AsyncSession, user: UserCreate):
